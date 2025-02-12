@@ -1,0 +1,48 @@
+name: Build and Test - Custom Container
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    container:
+      # The main container that runs the tests.
+      # This is very flexible because we can choose the base image.
+      image: bellsoft/liberica-openjdk-alpine:21
+
+      # Share the host Docker socket
+      # so that testcontainers can control docker environment
+      options: --privileged
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+
+    steps:
+      # It's recommended to create a custom image
+      # and preinstall docker-cli and required packages
+      - name: Install Docker
+        run: |
+          apk add --no-cache docker-cli
+
+      # Tests that the main container can talk to host Docker
+      - name: Validate Docker
+        run: docker ps
+
+      - name: Validate java
+        run: |
+          echo $JAVA_HOME
+          echo $PATH
+          which java
+          type java
+          java -version
+
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Grant execute permission for Gradlew
+        run: chmod +x gradlew
+
+      - name: Build and Test
+        run: ./gradlew test

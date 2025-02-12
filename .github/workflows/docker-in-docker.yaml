@@ -1,0 +1,49 @@
+name: Build and Test - Docker-in-Docker (DIND)
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    container:
+      # The main container that runs the tests.
+      # Use Docker image with Docker (dind), so it can run its own daemon.
+      # This is inflexible because we cannot choose the base image.
+      image: docker:27-dind
+      # "privileged" is required for Docker-in-Docker
+      options: --privileged
+
+    steps:
+      - name: Validate Docker
+        run: docker version
+
+      # setup-java doesn't support installing a JDK on MUSL based systems (like alpine)
+      # https://github.com/actions/setup-java/issues/678#issuecomment-2450993641
+      - name: Set up JDK
+        run: |
+          apk update
+          apk add --no-cache openjdk17 gradle
+      # uses: actions/setup-java@v4
+      # with:
+      #   distribution: 'liberica'
+      #   java-version: 21
+
+      - name: Validate java
+        run: |
+          echo $JAVA_HOME
+          echo $PATH
+          which java
+          type java
+          java -version
+
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Grant execute permission for Gradlew
+        run: chmod +x gradlew
+
+      - name: Build and Test
+        run: ./gradlew test

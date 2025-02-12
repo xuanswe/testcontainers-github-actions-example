@@ -1,0 +1,22 @@
+# https://docs.gradle.org/current/userguide/version_catalogs.html
+
+[versions]
+junit = "5.11.4"
+testcontainers = "1.20.4"
+
+[libraries]
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
+kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5" }
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers" }
+testcontainers-testcontainers = { module = "org.testcontainers:testcontainers" }
+testcontainers-junit = { module = "org.testcontainers:junit-jupiter" }
+testcontainers-postgresql = { module = "org.testcontainers:postgresql" }
+
+[bundles]
+kotlinTest = ["kotlin-test", "kotlin-test-junit5"]
+testcontainers = ["testcontainers-testcontainers", "testcontainers-junit", "testcontainers-postgresql"]
+
+[plugins]
